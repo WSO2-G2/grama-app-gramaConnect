@@ -4,6 +4,12 @@ import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
 import ballerina/http;
 
+configurable int PORT = ?;
+configurable string DB = ?;
+configurable string PASSWORD = ?;
+configurable string USER = ?;
+configurable string HOST = ?;
+
 type request record {
     string nic;
     string address;
@@ -27,7 +33,7 @@ type status record {
 service / on new http:Listener(9090) {
 
     resource function get getdetails(string nic) returns person|error? {
-        mysql:Client mysqlEp = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaIdentityCheck", port = 3306);
+        mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         person|error queryRowResponse = mysqlEp->queryRow(sqlQuery = `SELECT * FROM person WHERE nic = ${nic}`);
         error? e = mysqlEp.close();
@@ -39,7 +45,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function get requestdetails(string nic) returns request|error? {
-        mysql:Client mysqlEp2 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        mysql:Client mysqlEp2 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         request|error queryRowResponse = mysqlEp2->queryRow(sqlQuery = `SELECT * FROM request WHERE nic = ${nic}`);
         error? e = mysqlEp2.close();
@@ -51,7 +57,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function patch updateStatus(@http:Payload status payload, string nic) returns sql:ExecutionResult|error {
-        mysql:Client mysqlEp1 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        mysql:Client mysqlEp1 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         sql:ExecutionResult executeResponse = check mysqlEp1->execute(sqlQuery = `UPDATE request SET  status = ${payload.status} WHERE nic = ${nic}`);
         error? e = mysqlEp1.close();
@@ -63,7 +69,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function get getrequests(string gnd) returns request[]|error? {
-        mysql:Client mysqlEp5 = check new (host = "workzone.c6yaihe9lzwl.us-west-2.rds.amazonaws.com", user = "admin", password = "Malithi1234", database = "gramaAddressCheck", port = 3306);
+        mysql:Client mysqlEp5 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
         request[] requests = [];
 
         stream<request, error?> queryResponse = mysqlEp5->query(sqlQuery = `SELECT * FROM request WHERE gnd = ${gnd} AND status = "Pending"`);

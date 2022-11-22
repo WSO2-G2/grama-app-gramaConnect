@@ -1,6 +1,46 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "gramaappproject": {
+      "type": "object",
+      "properties": {
+        "gramaconnect": {
+          "type": "object",
+          "properties": {
+            "PORT": {
+              "type": "integer",
+              "description": ""
+            },
+            "DB": {
+              "type": "string",
+              "description": ""
+            },
+            "PASSWORD": {
+              "type": "string",
+              "description": ""
+            },
+            "USER": {
+              "type": "string",
+              "description": ""
+            },
+            "HOST": {
+              "type": "string",
+              "description": ""
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "PORT",
+            "DB",
+            "PASSWORD",
+            "USER",
+            "HOST"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
   "additionalProperties": false
 }
