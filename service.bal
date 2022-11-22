@@ -16,7 +16,8 @@ type request record {
     string address;
     string image;
     string status;
-    string gnd;
+    string phone;
+    string email;
 };
 
 type person record {
