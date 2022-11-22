@@ -6,6 +6,7 @@ import ballerina/http;
 
 configurable int PORT = ?;
 configurable string DB = ?;
+configurable string DB1 = ?;
 configurable string PASSWORD = ?;
 configurable string USER = ?;
 configurable string HOST = ?;
@@ -33,7 +34,7 @@ type status record {
 service / on new http:Listener(9090) {
 
     resource function get getdetails(string nic) returns person|error? {
-        mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
+        mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB1, port = PORT);
 
         person|error queryRowResponse = mysqlEp->queryRow(sqlQuery = `SELECT * FROM person WHERE nic = ${nic}`);
         error? e = mysqlEp.close();

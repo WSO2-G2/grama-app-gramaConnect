@@ -16,6 +16,10 @@
               "type": "string",
               "description": ""
             },
+            "DB1": {
+              "type": "string",
+              "description": ""
+            },
             "PASSWORD": {
               "type": "string",
               "description": ""
@@ -33,6 +37,7 @@
           "required": [
             "PORT",
             "DB",
+            "DB1",
             "PASSWORD",
             "USER",
             "HOST"
