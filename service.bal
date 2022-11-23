@@ -43,15 +43,17 @@ twilio:Client twilioEp = check new (twilioConfig = {
 
 # A service representing a network-accessible API
 # bound to port `9090`.
+# + fromPhone - The twilio phone number which the sms will originate from. 
+# + msg - Message body of the sms. 
+# + toPhone - The phone number which the sms will be sent to.
+# + return - sendSMS function returns the sms response or an error.
 
+public function sendSMS(string fromPhone, string msg, string toPhone) returns twilio:SmsResponse|error? {
+    twilio:SmsResponse|error response = twilioEp->sendSms(fromPhone, toPhone, msg);
+    return response;
+}
 
-public function sendSMS(string fromPhone, string msg, string toPhone) returns twilio:SmsResponse|error?{
-        twilio:SmsResponse|error response =  twilioEp->sendSms(fromPhone, toPhone, msg);
-        return response;
-    }
 service / on new http:Listener(9090) {
-
-    
 
     resource function get getdetails(string nic) returns person|error? {
         mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB1, port = PORT);
@@ -85,13 +87,12 @@ service / on new http:Listener(9090) {
         if (e is error) {
             return e;
         }
-        if(payload.status=="Accepted"){
-            twilio:SmsResponse|error? response = sendSMS(FROMPHONE,"Your grama certificate for the NIC "+nic+" is ready. Please visit the website for more details.",phone);
-        }else{
-            twilio:SmsResponse|error? response = sendSMS(FROMPHONE,"Your grama certificate for the NIC "+nic+" has been rejected. Please visit the website for more details.",phone);
+        if (payload.status == "Accepted") {
+            twilio:SmsResponse|error? response = sendSMS(FROMPHONE, "Your grama certificate for the NIC " + nic + " is ready. Please visit the website for more details.", phone);
+        } else {
+            twilio:SmsResponse|error? response = sendSMS(FROMPHONE, "Your grama certificate for the NIC " + nic + " has been rejected. Please visit the website for more details.", phone);
         }
-        
-        
+
         return executeResponse;
 
     }
@@ -101,6 +102,10 @@ service / on new http:Listener(9090) {
         request[] requests = [];
 
         stream<request, error?> queryResponse = mysqlEp5->query(sqlQuery = `SELECT * FROM request WHERE status = "Pending"`);
+        error? e = mysqlEp5.close();
+        if (e is error) {
+            return e;
+        }
         check from request request in queryResponse
             do {
                 requests.push(request);
@@ -110,7 +115,5 @@ service / on new http:Listener(9090) {
         return requests;
 
     }
-
-    
 
 }
