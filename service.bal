@@ -1,3 +1,4 @@
+import ballerinax/twilio;
 import ballerinax/mysql.driver as _;
 import ballerina/sql;
 import ballerinax/mysql;
@@ -10,6 +11,9 @@ configurable string DB1 = ?;
 configurable string PASSWORD = ?;
 configurable string USER = ?;
 configurable string HOST = ?;
+configurable string SID = ?;
+configurable string AUTHTOKEN = ?;
+configurable string FROMPHONE = ?;
 
 type request record {
     string nic;
@@ -30,9 +34,24 @@ type status record {
     string status;
 };
 
+twilio:Client twilioEp = check new (twilioConfig = {
+    auth: {
+        accountSId: SID,
+        authToken: AUTHTOKEN
+    }
+});
+
 # A service representing a network-accessible API
 # bound to port `9090`.
+
+
+public function sendSMS(string fromPhone, string msg, string toPhone) returns twilio:SmsResponse|error?{
+        twilio:SmsResponse|error response =  twilioEp->sendSms(fromPhone, toPhone, msg);
+        return response;
+    }
 service / on new http:Listener(9090) {
+
+    
 
     resource function get getdetails(string nic) returns person|error? {
         mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB1, port = PORT);
@@ -58,7 +77,7 @@ service / on new http:Listener(9090) {
 
     }
 
-    resource function patch updateStatus(@http:Payload status payload, string nic) returns sql:ExecutionResult|error {
+    resource function patch updateStatus(@http:Payload status payload, string nic, string phone) returns sql:ExecutionResult|error {
         mysql:Client mysqlEp1 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         sql:ExecutionResult executeResponse = check mysqlEp1->execute(sqlQuery = `UPDATE request SET  status = ${payload.status} WHERE nic = ${nic}`);
@@ -66,6 +85,13 @@ service / on new http:Listener(9090) {
         if (e is error) {
             return e;
         }
+        if(payload.status=="Accepted"){
+            twilio:SmsResponse|error? response = sendSMS(FROMPHONE,"Your grama certificate for the NIC "+nic+" is ready. Please visit the website for more details.",phone);
+        }else{
+            twilio:SmsResponse|error? response = sendSMS(FROMPHONE,"Your grama certificate for the NIC "+nic+" has been rejected. Please visit the website for more details.",phone);
+        }
+        
+        
         return executeResponse;
 
     }
@@ -74,7 +100,7 @@ service / on new http:Listener(9090) {
         mysql:Client mysqlEp5 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
         request[] requests = [];
 
-        stream<request, error?> queryResponse = mysqlEp5->query(sqlQuery = `SELECT * FROM request WHERE gnd = ${gnd} AND status = "Pending"`);
+        stream<request, error?> queryResponse = mysqlEp5->query(sqlQuery = `SELECT * FROM request WHERE status = "Pending"`);
         check from request request in queryResponse
             do {
                 requests.push(request);
@@ -84,5 +110,7 @@ service / on new http:Listener(9090) {
         return requests;
 
     }
+
+    
 
 }
