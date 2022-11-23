@@ -7,7 +7,6 @@ import ballerina/http;
 
 configurable int PORT = ?;
 configurable string DB = ?;
-configurable string DB1 = ?;
 configurable string PASSWORD = ?;
 configurable string USER = ?;
 configurable string HOST = ?;
@@ -55,18 +54,6 @@ public function sendSMS(string fromPhone, string msg, string toPhone) returns tw
 
 service / on new http:Listener(9090) {
 
-    resource function get getdetails(string nic) returns person|error? {
-        mysql:Client mysqlEp = check new (host = HOST, user = USER, password = PASSWORD, database = DB1, port = PORT);
-
-        person|error queryRowResponse = mysqlEp->queryRow(sqlQuery = `SELECT * FROM person WHERE nic = ${nic}`);
-        error? e = mysqlEp.close();
-        if (e is error) {
-            return e;
-        }
-        return queryRowResponse;
-
-    }
-
     resource function get requestdetails(string nic) returns request|error? {
         mysql:Client mysqlEp2 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
@@ -113,6 +100,23 @@ service / on new http:Listener(9090) {
         check queryResponse.close();
 
         return requests;
+
+    }
+
+    resource function get requestavailable(string nic) returns boolean|error? {
+        mysql:Client mysqlEp3 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
+
+        request|error queryRowResponse = mysqlEp3->queryRow(sqlQuery = `SELECT * FROM request WHERE nic = ${nic} AND status = 'Pending'`);
+        error? e = mysqlEp3.close();
+        if (e is error) {
+            return e;
+        }
+         if(queryRowResponse is error){
+            return false;
+        }
+        else{
+            return true;
+        }
 
     }
 
