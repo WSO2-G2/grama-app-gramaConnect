@@ -130,6 +130,14 @@ dependencies = [
 
 [[package]]
 org = "ballerina"
+name = "lang.boolean"
+version = "0.0.0"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"}
+]
+
+[[package]]
+org = "ballerina"
 name = "lang.decimal"
 version = "0.0.0"
 dependencies = [
@@ -306,6 +314,23 @@ modules = [
 ]
 
 [[package]]
+org = "ballerinax"
+name = "twilio"
+version = "3.0.0"
+dependencies = [
+	{org = "ballerina", name = "auth"},
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "lang.boolean"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "mime"},
+	{org = "ballerina", name = "os"},
+	{org = "ballerina", name = "url"}
+]
+modules = [
+	{org = "ballerinax", packageName = "twilio", moduleName = "twilio"}
+]
+
+[[package]]
 org = "gramaappproject"
 name = "gramaconnect"
 version = "0.1.0"
@@ -314,7 +339,8 @@ dependencies = [
 	{org = "ballerina", name = "sql"},
 	{org = "ballerinai", name = "observe"},
 	{org = "ballerinax", name = "mysql"},
-	{org = "ballerinax", name = "mysql.driver"}
+	{org = "ballerinax", name = "mysql.driver"},
+	{org = "ballerinax", name = "twilio"}
 ]
 modules = [
 	{org = "gramaappproject", packageName = "gramaconnect", moduleName = "gramaconnect"}
