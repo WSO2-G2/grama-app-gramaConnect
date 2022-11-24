@@ -21,6 +21,7 @@ type request record {
     string status;
     string phone;
     string email;
+    string name;
 };
 
 type person record {
