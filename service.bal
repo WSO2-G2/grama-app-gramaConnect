@@ -65,6 +65,7 @@ service / on new http:Listener(9090) {
         }
         return queryRowResponse;
 
+
     }
 
     resource function patch updateStatus(@http:Payload status payload, string nic, string phone) returns sql:ExecutionResult|error {
@@ -108,6 +109,23 @@ service / on new http:Listener(9090) {
         mysql:Client mysqlEp3 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
 
         request|error queryRowResponse = mysqlEp3->queryRow(sqlQuery = `SELECT * FROM request WHERE nic = ${nic} AND status = 'Pending'`);
+        error? e = mysqlEp3.close();
+        if (e is error) {
+            return e;
+        }
+         if(queryRowResponse is error){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+    resource function get requestavailable1(string nic) returns boolean|error? {
+        mysql:Client mysqlEp3 = check new (host = HOST, user = USER, password = PASSWORD, database = DB, port = PORT);
+
+        request|error queryRowResponse = mysqlEp3->queryRow(sqlQuery = `SELECT * FROM request WHERE nic = ${nic} `);
         error? e = mysqlEp3.close();
         if (e is error) {
             return e;
